@@ -16,6 +16,8 @@ angular.module('angular-on-screen', []).directive('hjOnScreen', ['$window', '$do
                     scroller: 'window',
                     scope: $scope,
                     range: 1000,
+                    onUpdate: function($el, $scope) {},
+                    onChange: function($el, $scope) {}
                     // rangeTop: 1000,
                     // rangeBottom: 1000,
                     // className: 'on-screen'
@@ -77,12 +79,16 @@ angular.module('angular-on-screen', []).directive('hjOnScreen', ['$window', '$do
                             }
                         }
 
+                        options.onChange($element[0], scope);
+
                         if (!$scope.$$phase) {
                             $scope.$apply();
                         }
                     }
 
                     scope.onScreenPrev = onScreen;
+
+                    options.onUpdate($element[0], scope);
                 };
 
                 $timeout(update); // delay init incase of ngRepeats

@@ -29,6 +29,7 @@ angular.module('hj.onScreen', []).directive('hjOnScreen', ['$window', '$document
                 var scroller = options.scroller === 'window' ? $window : $document[0].querySelector(options.scroller);
                 var latestKnownScrollY = 0;
                 var ticking = false;
+                var updateTimeout;
 
                 scope.$onScreen = false;
 
@@ -40,7 +41,10 @@ angular.module('hj.onScreen', []).directive('hjOnScreen', ['$window', '$document
 
                 var requestTick = function() {
                     if (!ticking) {
-                        requestAnimationFrame(update);
+                        requestAnimationFrame(function() {
+                            $timeout.cancel(updateTimeout);
+                            updateTimeout = $timeout(update, 50);
+                        });
                     }
 
                     ticking = true;
@@ -80,10 +84,6 @@ angular.module('hj.onScreen', []).directive('hjOnScreen', ['$window', '$document
                         }
 
                         options.onChange($element[0], scope);
-
-                        if (!$scope.$$phase) {
-                            $scope.$apply();
-                        }
                     }
 
                     scope.$onScreenPrev = onScreen;

@@ -20,7 +20,7 @@ Angular directive which checks if an element is within a certain range of viewpo
 
 		<div ng-repeat="image in images" hj-on-screen="{scroller: '.scroller', scope: image, range: 1000, className: 'on-screen'}">
 
-			<img ng-if="image.onScreen" ng-src="{{image.src}}">
+			<img ng-if="image.$onScreen" ng-src="{{image.src}}">
 
 		</div>
 

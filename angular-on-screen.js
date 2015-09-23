@@ -5,7 +5,7 @@
     Author: jameshomer85@gmail.com
     Licence: MIT
 */
-angular.module('angular-on-screen', []).directive('hjOnScreen', ['$window', '$document', '$timeout',
+angular.module('hj.onScreen', []).directive('hjOnScreen', ['$window', '$document', '$timeout',
     function($window, $document, $timeout) {
         'use strict';
         return {
@@ -17,20 +17,20 @@ angular.module('angular-on-screen', []).directive('hjOnScreen', ['$window', '$do
                     scope: $scope,
                     range: 1000,
                     onUpdate: function($el, $scope) {},
-                    onChange: function($el, $scope) {}
+                    onChange: function($el, $scope) {},
                     // rangeTop: 1000,
                     // rangeBottom: 1000,
-                    // className: 'on-screen'
+                    // className: 'on-screen',
                 };
 
                 var options = angular.extend(defaults, $scope.$eval(attrs.hjOnScreen));
 
-                var scope = options.scope,
-                    scroller = options.scroller === 'window' ? $window : $document[0].querySelector(options.scroller),
-                    latestKnownScrollY = 0,
-                    ticking = false;
+                var scope = options.scope;
+                var scroller = options.scroller === 'window' ? $window : $document[0].querySelector(options.scroller);
+                var latestKnownScrollY = 0;
+                var ticking = false;
 
-                scope.onScreen = false;
+                scope.$onScreen = false;
 
                 var onScroll = function() {
                     latestKnownScrollY = options.scroller === 'window' ? scroller.scrollY : scroller.scrollTop;
@@ -67,12 +67,12 @@ angular.module('angular-on-screen', []).directive('hjOnScreen', ['$window', '$do
                         onScreenPercent = (elHeight + elTopYPos - (elBottomYPos - scrollerHeight)) / elHeight;
                     }
 
-                    scope.onScreen = onScreen;
-                    scope.onScreenPercent = onScreenPercent;
+                    scope.$onScreen = onScreen;
+                    scope.$onScreenPercent = onScreenPercent;
 
-                    if (scope.onScreen !== scope.onScreenPrev) {
-                        if (options.className) {                        
-                            if (scope.onScreen) {
+                    if (scope.$onScreen !== scope.$onScreenPrev) {
+                        if (options.className) {
+                            if (scope.$onScreen) {
                                 $element[0].classList.add(options.className);
                             } else {
                                 $element[0].classList.remove(options.className);
@@ -86,7 +86,7 @@ angular.module('angular-on-screen', []).directive('hjOnScreen', ['$window', '$do
                         }
                     }
 
-                    scope.onScreenPrev = onScreen;
+                    scope.$onScreenPrev = onScreen;
 
                     options.onUpdate($element[0], scope);
                 };

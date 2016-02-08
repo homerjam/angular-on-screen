@@ -1,6 +1,6 @@
 {
   "name": "angular-on-screen",
-  "version": "0.0.4",
+  "version": "0.1.0",
   "description": "Angular directive which checks if an element is within a certain range of viewport",
   "main": "angular-on-screen.js",
   "ignore": [
@@ -9,6 +9,6 @@
   	"!README.md"
   ],
   "dependencies": {
-    "angular": "~1.2.18"
+    "angular": "~1.2.0"
   }
 }

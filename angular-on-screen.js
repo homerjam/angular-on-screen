@@ -22,6 +22,7 @@
               range: 1000,
               onUpdate: function ($el, $scope) {},
               onChange: function ($el, $scope) {},
+              once: false,
             //   rangeTop: 1000,
             //   rangeBottom: 1000,
             //   className: 'on-screen',
@@ -57,13 +58,13 @@
             var update = function () {
               ticking = false;
 
-              var currentScrollY = latestKnownScrollY,
-                elHeight = $element[0].scrollHeight,
-                elTopYPos = $element[0].offsetTop - currentScrollY,
-                elBottomYPos = elTopYPos + elHeight,
-                scrollerHeight = options.scroller === 'window' ? $window.innerHeight : scroller.clientHeight,
-                onScreen = !(elBottomYPos + (options.rangeTop || options.range) < 0 || elTopYPos - (options.rangeBottom || options.range) > scrollerHeight),
-                onScreenPercent;
+              var currentScrollY = latestKnownScrollY;
+              var elHeight = $element[0].scrollHeight;
+              var elTopYPos = $element[0].offsetTop - currentScrollY;
+              var elBottomYPos = elTopYPos + elHeight;
+              var scrollerHeight = options.scroller === 'window' ? $window.innerHeight : scroller.clientHeight;
+              var onScreen = !(elBottomYPos + (options.rangeTop || options.range) < 0 || elTopYPos - (options.rangeBottom || options.range) > scrollerHeight);
+              var onScreenPercent;
 
               if (elTopYPos > 0) {
                 onScreenPercent = Math.min(1, (scrollerHeight - elTopYPos) / elHeight);
@@ -93,15 +94,25 @@
               scope.$onScreenPrev = onScreen;
 
               options.onUpdate($element[0], scope);
+
+              if (options.once && onScreen) {
+                onDestroy();
+              }
             };
 
-            $timeout(update); // delay init incase of ngRepeats
+            var onDestroy = function () {
+              angular.element(scroller).off('scroll', onScroll);
+            };
+
+            var init = function () {
+              update();
+            };
 
             angular.element(scroller).on('scroll', onScroll);
 
-            $scope.$on('$destroy', function () {
-              angular.element(scroller).off('scroll', onScroll);
-            });
+            $scope.$on('$destroy', onDestroy);
+
+            $timeout(init); // delay init incase of ngRepeats
 
           }
         };

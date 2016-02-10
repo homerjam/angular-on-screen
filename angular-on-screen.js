@@ -33,31 +33,33 @@
             var scope = options.scope;
             var scroller = options.scroller === 'window' ? $window : $document[0].querySelector(options.scroller);
             var latestKnownScrollY = 0;
-            var ticking = false;
-            var updateTimeout;
 
             scope.$onScreen = false;
 
-            var onScroll = function () {
-              latestKnownScrollY = options.scroller === 'window' ? scroller.scrollY : scroller.scrollTop;
+            var throttle = function (func) {
+              var timeout;
+              return function () {
+                var context = this;
+                var args = arguments;
 
-              requestTick();
-            };
+                if ($window.requestAnimationFrame) {
+                  $window.cancelAnimationFrame(timeout);
+                  timeout = $window.requestAnimationFrame(function () {
+                    func.apply(context, args);
+                    timeout = null;
+                  });
 
-            var requestTick = function () {
-              if (!ticking) {
-                requestAnimationFrame(function () {
-                  $timeout.cancel(updateTimeout);
-                  updateTimeout = $timeout(update, 50);
-                });
-              }
-
-              ticking = true;
+                } else {
+                  $timeout.cancel(timeout);
+                  timeout = $timeout(function () {
+                    func.apply(context, args);
+                    timeout = null;
+                  }, 1000 / 16);
+                }
+              };
             };
 
             var update = function () {
-              ticking = false;
-
               var currentScrollY = latestKnownScrollY;
               var elHeight = $element[0].scrollHeight;
               var elTopYPos = $element[0].offsetTop - currentScrollY;
@@ -98,6 +100,14 @@
               if (options.once && onScreen) {
                 onDestroy();
               }
+            };
+
+            var throttledUpdate = throttle(update);
+
+            var onScroll = function () {
+              latestKnownScrollY = options.scroller === 'window' ? scroller.scrollY : scroller.scrollTop;
+
+              throttledUpdate(update);
             };
 
             var onDestroy = function () {
